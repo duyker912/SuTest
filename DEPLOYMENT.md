@@ -29,10 +29,13 @@
 ### 3. Cấu hình Database
 1. Thêm PostgreSQL service trên Railway
 2. Copy connection string vào `DATABASE_URL`
-3. Chạy migrations:
-   ```bash
-   npx prisma db push
-   ```
+3. Database sẽ được tự động setup khi deploy (Prisma generate sẽ chạy tự động)
+
+### 4. Troubleshooting Build Issues
+Nếu gặp lỗi build:
+- Kiểm tra `package-lock.json` có tồn tại
+- Đảm bảo tất cả dependencies được cài đặt đúng
+- Prisma client sẽ được generate tự động trong quá trình build
 
 ## Frontend (Vercel)
 
