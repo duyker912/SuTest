@@ -37,25 +37,29 @@ Nếu gặp lỗi build:
 - Đảm bảo tất cả dependencies được cài đặt đúng
 - Prisma client sẽ được generate tự động trong quá trình build
 
-## Frontend (Vercel)
+## Frontend (Netlify)
 
 ### 1. Chuẩn bị
-- Tạo tài khoản Vercel tại [vercel.com](https://vercel.com)
+- Tạo tài khoản Netlify tại [netlify.com](https://netlify.com)
 - Kết nối GitHub repository
 
 ### 2. Deploy Frontend
-1. Tạo project mới trên Vercel
-2. Chọn repository và folder `frontend`
+1. Đăng nhập Netlify và chọn "New site from Git"
+2. Chọn GitHub và repository của bạn
 3. Cấu hình build settings:
-   - Framework Preset: Vite
-   - Build Command: `npm run build`
-   - Output Directory: `dist`
-4. Cấu hình environment variables:
+   - Base directory: `frontend`
+   - Build command: `npm run build`
+   - Publish directory: `frontend/dist`
+4. Cấu hình environment variables trong Site settings > Environment variables:
    ```
    VITE_API_URL=https://your-backend-domain.railway.app/api
    VITE_NODE_ENV=production
    ```
 5. Deploy
+
+### 3. Cấu hình Custom Domain (tùy chọn)
+- Vào Site settings > Domain management
+- Thêm custom domain nếu có
 
 ## Cấu hình Domain
 
@@ -63,9 +67,9 @@ Nếu gặp lỗi build:
 - Railway cung cấp domain tự động: `your-app.railway.app`
 - Có thể custom domain trong Railway dashboard
 
-### 2. Frontend (Vercel)
-- Vercel cung cấp domain tự động: `your-app.vercel.app`
-- Có thể custom domain trong Vercel dashboard
+### 2. Frontend (Netlify)
+- Netlify cung cấp domain tự động: `your-app.netlify.app`
+- Có thể custom domain trong Netlify dashboard
 
 ## Kiểm tra Deploy
 
@@ -75,7 +79,7 @@ curl https://your-backend-domain.railway.app/health
 ```
 
 ### 2. Frontend
-Truy cập: `https://your-frontend-domain.vercel.app`
+Truy cập: `https://your-frontend-domain.netlify.app`
 
 ## Troubleshooting
 
@@ -85,14 +89,14 @@ Truy cập: `https://your-frontend-domain.vercel.app`
 - Kiểm tra database connection
 
 ### Frontend Issues
-- Kiểm tra build logs trên Vercel
+- Kiểm tra build logs trên Netlify
 - Đảm bảo API URL đã được cấu hình đúng
 - Kiểm tra network requests trong browser DevTools
 
 ## SSL/HTTPS
-- Railway và Vercel đều tự động cung cấp SSL certificate
+- Railway và Netlify đều tự động cung cấp SSL certificate
 - Không cần cấu hình thêm
 
 ## Monitoring
 - Railway: Built-in monitoring và logs
-- Vercel: Built-in analytics và performance monitoring
+- Netlify: Built-in analytics và performance monitoring

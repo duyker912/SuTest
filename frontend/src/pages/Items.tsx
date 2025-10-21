@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Search, Package, Filter, Star } from 'lucide-react'
+import { Search, Package } from 'lucide-react'
 import { apiService } from '../services/api'
 
 interface Item {
