@@ -43,27 +43,21 @@ export class MSUApiService {
         return response;
       },
       (error) => {
-        console.error('❌ MSU API Response Error:', {
-          status: error.response?.status,
-          url: error.config?.url,
-          message: error.message
-        });
+        const status = error.response?.status as number | undefined;
+        const upstream = error.response?.data;
+        const url = error.config?.url;
+        const upstreamMessage = upstream?.error?.message || upstream?.message || error.message;
+        const upstreamCode = upstream?.error?.name || upstream?.error?.code || 'MSU_API_ERROR';
 
-        if (error.response?.status === 429) {
-          throw new AppError('Đã vượt quá giới hạn API requests', 429, 'RATE_LIMIT_EXCEEDED');
-        } else if (error.response?.status === 401) {
-          throw new AppError('API key không hợp lệ hoặc đã hết hạn', 401, 'INVALID_API_KEY');
-        } else if (error.response?.status === 403) {
-          throw new AppError('Không có quyền truy cập API', 403, 'API_FORBIDDEN');
-        } else if (error.response?.status >= 500) {
-          throw new AppError('Lỗi server từ MSU API', 502, 'MSU_API_ERROR');
+        console.error('❌ MSU API Response Error:', { status, url, upstreamMessage, upstreamCode });
+
+        if (status) {
+          // Phản hồi nguyên trạng mã lỗi từ MSU để client thấy rõ lý do (ví dụ OPENAPI00005)
+          throw new AppError(upstreamMessage || 'MSU API error', status, upstreamCode);
         }
 
-        throw new AppError(
-          error.response?.data?.message || 'Lỗi kết nối đến MSU API',
-          502,
-          'MSU_API_ERROR'
-        );
+        // Không có response (lỗi mạng/DNS/timeouts)
+        throw new AppError('Lỗi kết nối đến MSU API', 502, 'MSU_API_ERROR');
       }
     );
   }
