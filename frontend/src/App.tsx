@@ -6,6 +6,7 @@ import Characters from './pages/Characters'
 import Guilds from './pages/Guilds'
 import Items from './pages/Items'
 import About from './pages/About'
+import Accounts from './pages/Accounts'
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
           <Route path="/characters" element={<Characters />} />
           <Route path="/guilds" element={<Guilds />} />
           <Route path="/items" element={<Items />} />
+          <Route path="/accounts" element={<Accounts />} />
           <Route path="/about" element={<About />} />
         </Routes>
       </main>

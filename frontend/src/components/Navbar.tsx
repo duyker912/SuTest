@@ -9,6 +9,7 @@ const Navbar = () => {
     { path: '/characters', label: 'Nhân vật', icon: Search },
     { path: '/guilds', label: 'Guild', icon: Users },
     { path: '/items', label: 'Vật phẩm', icon: Package },
+    { path: '/accounts', label: 'Accounts', icon: Users },
     { path: '/about', label: 'Giới thiệu', icon: Info },
   ]
 

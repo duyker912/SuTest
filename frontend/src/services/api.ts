@@ -139,6 +139,38 @@ class ApiService {
     return response.data
   }
 
+  // v1rc1 Accounts endpoints
+  async getAccountCharacters(walletAddress: string, opts?: { isTradable?: boolean; pageNo?: number; pageSize?: number }) {
+    const params: any = {}
+    if (typeof opts?.isTradable === 'boolean') params.isTradable = opts.isTradable
+    if (opts?.pageNo) params['paginationParam.pageNo'] = opts.pageNo
+    if (opts?.pageSize) params['paginationParam.pageSize'] = opts.pageSize
+    const response = await this.api.get(`/msu/accounts/${walletAddress}/characters`, { params })
+    return response.data
+  }
+
+  async getAccountCurrencies(walletAddress: string) {
+    const response = await this.api.get(`/msu/accounts/${walletAddress}/currencies`)
+    return response.data
+  }
+
+  async getAccountItems(walletAddress: string, opts?: { categoryNo?: number; isOnSale?: boolean; tokenName?: string; tokenId?: string; pageNo?: number; pageSize?: number }) {
+    const params: any = {}
+    if (opts?.categoryNo !== undefined) params.categoryNo = opts.categoryNo
+    if (typeof opts?.isOnSale === 'boolean') params.isOnSale = opts.isOnSale
+    if (opts?.tokenName) params.tokenName = opts.tokenName
+    if (opts?.tokenId) params.tokenId = opts.tokenId
+    if (opts?.pageNo) params['paginationParam.pageNo'] = opts.pageNo
+    if (opts?.pageSize) params['paginationParam.pageSize'] = opts.pageSize
+    const response = await this.api.get(`/msu/accounts/${walletAddress}/items`, { params })
+    return response.data
+  }
+
+  async getAccountNeso(walletAddress: string) {
+    const response = await this.api.get(`/msu/accounts/${walletAddress}/neso`)
+    return response.data
+  }
+
   // Auth endpoints
   async login(email: string, password: string) {
     const response = await this.api.post('/auth/login', { email, password })
