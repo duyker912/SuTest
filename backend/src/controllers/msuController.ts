@@ -227,11 +227,12 @@ export const getAccountCharacters = asyncHandler(async (req: Request, res: Respo
     })
   }
 
-  const data = await msuApiService.getAccountCharacters(walletAddress, {
-    isTradable: typeof isTradable === 'string' ? isTradable === 'true' : undefined,
-    pageNo: pageNo ? parseInt(pageNo as string) : undefined,
-    pageSize: pageSize ? parseInt(pageSize as string) : undefined,
-  })
+  const optsChars: any = {}
+  if (typeof isTradable === 'string') optsChars.isTradable = isTradable === 'true'
+  if (pageNo) optsChars.pageNo = parseInt(pageNo as string)
+  if (pageSize) optsChars.pageSize = parseInt(pageSize as string)
+
+  const data = await msuApiService.getAccountCharacters(walletAddress, optsChars)
 
   return res.json({ success: true, data, timestamp: new Date().toISOString() })
 })
@@ -259,14 +260,15 @@ export const getAccountItems = asyncHandler(async (req: Request, res: Response) 
       timestamp: new Date().toISOString()
     })
   }
-  const data = await msuApiService.getAccountItems(walletAddress, {
-    categoryNo: categoryNo ? parseInt(categoryNo as string) : undefined,
-    isOnSale: typeof isOnSale === 'string' ? isOnSale === 'true' : undefined,
-    tokenName: tokenName as string | undefined,
-    tokenId: tokenId as string | undefined,
-    pageNo: pageNo ? parseInt(pageNo as string) : undefined,
-    pageSize: pageSize ? parseInt(pageSize as string) : undefined,
-  })
+  const optsItems: any = {}
+  if (categoryNo) optsItems.categoryNo = parseInt(categoryNo as string)
+  if (typeof isOnSale === 'string') optsItems.isOnSale = isOnSale === 'true'
+  if (tokenName) optsItems.tokenName = tokenName as string
+  if (tokenId) optsItems.tokenId = tokenId as string
+  if (pageNo) optsItems.pageNo = parseInt(pageNo as string)
+  if (pageSize) optsItems.pageSize = parseInt(pageSize as string)
+
+  const data = await msuApiService.getAccountItems(walletAddress, optsItems)
   return res.json({ success: true, data, timestamp: new Date().toISOString() })
 })
 
