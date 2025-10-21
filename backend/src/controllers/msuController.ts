@@ -213,3 +213,72 @@ export const msuHealthCheck = asyncHandler(async (req: Request, res: Response) =
     timestamp: new Date().toISOString()
   });
 });
+
+// v1rc1 Accounts controllers
+export const getAccountCharacters = asyncHandler(async (req: Request, res: Response) => {
+  const { walletAddress } = req.params
+  const { isTradable, pageNo, pageSize } = req.query
+
+  if (!walletAddress) {
+    return res.status(400).json({
+      success: false,
+      error: { code: 'MISSING_WALLET', message: 'walletAddress là bắt buộc' },
+      timestamp: new Date().toISOString()
+    })
+  }
+
+  const data = await msuApiService.getAccountCharacters(walletAddress, {
+    isTradable: typeof isTradable === 'string' ? isTradable === 'true' : undefined,
+    pageNo: pageNo ? parseInt(pageNo as string) : undefined,
+    pageSize: pageSize ? parseInt(pageSize as string) : undefined,
+  })
+
+  return res.json({ success: true, data, timestamp: new Date().toISOString() })
+})
+
+export const getAccountCurrencies = asyncHandler(async (req: Request, res: Response) => {
+  const { walletAddress } = req.params
+  if (!walletAddress) {
+    return res.status(400).json({
+      success: false,
+      error: { code: 'MISSING_WALLET', message: 'walletAddress là bắt buộc' },
+      timestamp: new Date().toISOString()
+    })
+  }
+  const data = await msuApiService.getAccountCurrencies(walletAddress)
+  return res.json({ success: true, data, timestamp: new Date().toISOString() })
+})
+
+export const getAccountItems = asyncHandler(async (req: Request, res: Response) => {
+  const { walletAddress } = req.params
+  const { categoryNo, isOnSale, tokenName, tokenId, pageNo, pageSize } = req.query
+  if (!walletAddress) {
+    return res.status(400).json({
+      success: false,
+      error: { code: 'MISSING_WALLET', message: 'walletAddress là bắt buộc' },
+      timestamp: new Date().toISOString()
+    })
+  }
+  const data = await msuApiService.getAccountItems(walletAddress, {
+    categoryNo: categoryNo ? parseInt(categoryNo as string) : undefined,
+    isOnSale: typeof isOnSale === 'string' ? isOnSale === 'true' : undefined,
+    tokenName: tokenName as string | undefined,
+    tokenId: tokenId as string | undefined,
+    pageNo: pageNo ? parseInt(pageNo as string) : undefined,
+    pageSize: pageSize ? parseInt(pageSize as string) : undefined,
+  })
+  return res.json({ success: true, data, timestamp: new Date().toISOString() })
+})
+
+export const getAccountNeso = asyncHandler(async (req: Request, res: Response) => {
+  const { walletAddress } = req.params
+  if (!walletAddress) {
+    return res.status(400).json({
+      success: false,
+      error: { code: 'MISSING_WALLET', message: 'walletAddress là bắt buộc' },
+      timestamp: new Date().toISOString()
+    })
+  }
+  const data = await msuApiService.getAccountNeso(walletAddress)
+  return res.json({ success: true, data, timestamp: new Date().toISOString() })
+})

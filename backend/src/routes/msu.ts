@@ -11,7 +11,11 @@ import {
   getItems,
   searchItems,
   getServers,
-  msuHealthCheck
+  msuHealthCheck,
+  getAccountCharacters,
+  getAccountCurrencies,
+  getAccountItems,
+  getAccountNeso
 } from '../controllers/msuController';
 
 const router = Router();
@@ -36,5 +40,11 @@ router.get('/guilds/:guildId', optionalAuth, getGuild);
 router.get('/items', optionalAuth, getItems);
 router.get('/items/search', optionalAuth, searchItems);
 router.get('/items/:itemId', optionalAuth, getItem);
+
+// v1rc1 Accounts routes
+router.get('/accounts/:walletAddress/characters', optionalAuth, getAccountCharacters)
+router.get('/accounts/:walletAddress/currencies', optionalAuth, getAccountCurrencies)
+router.get('/accounts/:walletAddress/items', optionalAuth, getAccountItems)
+router.get('/accounts/:walletAddress/neso', optionalAuth, getAccountNeso)
 
 export { router as msuController };

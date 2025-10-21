@@ -189,6 +189,50 @@ export class MSUApiService {
       return false;
     }
   }
+
+  // v1rc1 Accounts endpoints
+  async getAccountCharacters(
+    walletAddress: string,
+    options?: { isTradable?: boolean; pageNo?: number; pageSize?: number }
+  ): Promise<any> {
+    const params: any = {}
+    if (typeof options?.isTradable === 'boolean') params.isTradable = options.isTradable
+    if (options?.pageNo) params['paginationParam.pageNo'] = options.pageNo
+    if (options?.pageSize) params['paginationParam.pageSize'] = options.pageSize
+
+    const url = `/accounts/${walletAddress}/characters`
+    const response = await this.api.get(url, { params })
+    return response.data.data
+  }
+
+  async getAccountCurrencies(walletAddress: string): Promise<any> {
+    const url = `/accounts/${walletAddress}/currencies`
+    const response = await this.api.get(url)
+    return response.data.data
+  }
+
+  async getAccountItems(
+    walletAddress: string,
+    options?: { categoryNo?: number; isOnSale?: boolean; tokenName?: string; tokenId?: string; pageNo?: number; pageSize?: number }
+  ): Promise<any> {
+    const params: any = {}
+    if (options?.categoryNo !== undefined) params.categoryNo = options.categoryNo
+    if (typeof options?.isOnSale === 'boolean') params.isOnSale = options.isOnSale
+    if (options?.tokenName) params.tokenName = options.tokenName
+    if (options?.tokenId) params.tokenId = options.tokenId
+    if (options?.pageNo) params['paginationParam.pageNo'] = options.pageNo
+    if (options?.pageSize) params['paginationParam.pageSize'] = options.pageSize
+
+    const url = `/accounts/${walletAddress}/items`
+    const response = await this.api.get(url, { params })
+    return response.data.data
+  }
+
+  async getAccountNeso(walletAddress: string): Promise<any> {
+    const url = `/accounts/${walletAddress}/neso`
+    const response = await this.api.get(url)
+    return response.data.data
+  }
 }
 
 // Export singleton instance
