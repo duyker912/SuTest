@@ -6,9 +6,20 @@ import { asyncHandler } from '../middleware/errorHandler';
 export const getCharacter = asyncHandler(async (req: Request, res: Response) => {
   const { characterId } = req.params;
   
+  if (!characterId) {
+    return res.status(400).json({
+      success: false,
+      error: {
+        code: 'MISSING_CHARACTER_ID',
+        message: 'Character ID là bắt buộc'
+      },
+      timestamp: new Date().toISOString()
+    });
+  }
+  
   const character = await msuApiService.getCharacter(characterId);
   
-  res.json({
+  return res.json({
     success: true,
     data: character,
     timestamp: new Date().toISOString()
@@ -57,9 +68,20 @@ export const searchCharacters = asyncHandler(async (req: Request, res: Response)
 export const getGuild = asyncHandler(async (req: Request, res: Response) => {
   const { guildId } = req.params;
   
+  if (!guildId) {
+    return res.status(400).json({
+      success: false,
+      error: {
+        code: 'MISSING_GUILD_ID',
+        message: 'Guild ID là bắt buộc'
+      },
+      timestamp: new Date().toISOString()
+    });
+  }
+  
   const guild = await msuApiService.getGuild(guildId);
   
-  res.json({
+  return res.json({
     success: true,
     data: guild,
     timestamp: new Date().toISOString()
@@ -108,9 +130,20 @@ export const searchGuilds = asyncHandler(async (req: Request, res: Response) => 
 export const getItem = asyncHandler(async (req: Request, res: Response) => {
   const { itemId } = req.params;
   
+  if (!itemId) {
+    return res.status(400).json({
+      success: false,
+      error: {
+        code: 'MISSING_ITEM_ID',
+        message: 'Item ID là bắt buộc'
+      },
+      timestamp: new Date().toISOString()
+    });
+  }
+  
   const item = await msuApiService.getItem(itemId);
   
-  res.json({
+  return res.json({
     success: true,
     data: item,
     timestamp: new Date().toISOString()

@@ -61,7 +61,7 @@ async function logApiCall(req: Request, statusCode: number, responseTime: number
         statusCode,
         responseTime,
         ipAddress: req.ip || req.connection.remoteAddress || 'unknown',
-        userAgent: req.get('User-Agent') || undefined
+        userAgent: req.get('User-Agent') || null
       }
     });
 
