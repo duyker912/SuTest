@@ -1,0 +1,111 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  username  String   @unique
+  password  String
+  role      Role     @default(USER)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  apiKeys   APIKey[]
+  apiLogs   APILog[]
+
+  @@map("users")
+}
+
+model APIKey {
+  id        String    @id @default(cuid())
+  key       String    @unique
+  name      String
+  userId    String
+  isActive  Boolean   @default(true)
+  lastUsed  DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  // Relations
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  apiLogs   APILog[]
+
+  @@map("api_keys")
+}
+
+model APILog {
+  id          String   @id @default(cuid())
+  apiKeyId    String
+  endpoint    String
+  method      String
+  statusCode  Int
+  responseTime Int     // in milliseconds
+  ipAddress   String
+  userAgent   String?
+  createdAt   DateTime @default(now())
+
+  // Relations
+  apiKey      APIKey   @relation(fields: [apiKeyId], references: [id], onDelete: Cascade)
+
+  @@map("api_logs")
+}
+
+model Character {
+  id         String    @id @default(cuid())
+  msuId      String    @unique
+  name       String
+  level      Int
+  job        String
+  server     String
+  guild      String?
+  lastLogin  DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  @@map("characters")
+}
+
+model Guild {
+  id        String    @id @default(cuid())
+  msuId     String    @unique
+  name      String
+  server    String
+  level     Int
+  members   Int
+  leader    String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@map("guilds")
+}
+
+model Item {
+  id          String    @id @default(cuid())
+  msuId       String    @unique
+  name        String
+  type        String
+  rarity      String
+  level       Int?
+  stats       Json?     // Store stats as JSON
+  description String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@map("items")
+}
+
+enum Role {
+  USER
+  ADMIN
+}
