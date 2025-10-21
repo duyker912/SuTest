@@ -17,7 +17,8 @@ export class MSUApiService {
       baseURL: process.env.MSU_API_BASE_URL || 'https://openapi.msu.io/v1rc1',
       timeout: 30000,
       headers: {
-        'Authorization': `Bearer ${this.apiKey}`,
+        'x-nxopen-api-key': this.apiKey,
+        'accept': 'application/json',
         'Content-Type': 'application/json',
         'User-Agent': 'MapleStory-N-API/1.0.0'
       }
