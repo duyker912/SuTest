@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import { Router, Request, Response } from 'express';
 import { authenticateToken, requireRole } from '../middleware/auth';
 import { asyncHandler } from '../middleware/errorHandler';
 import { AppError } from '../middleware/errorHandler';
@@ -7,7 +7,7 @@ const router = Router();
 
 // Mock auth controller for now
 // In a real application, you would implement proper authentication
-const mockLogin = asyncHandler(async (req, res) => {
+const mockLogin = asyncHandler(async (req: Request, res: Response) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
@@ -36,7 +36,7 @@ const mockLogin = asyncHandler(async (req, res) => {
   }
 });
 
-const getProfile = asyncHandler(async (req, res) => {
+const getProfile = asyncHandler(async (req: Request, res: Response) => {
   // Mock user profile
   res.json({
     success: true,

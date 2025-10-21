@@ -18,7 +18,7 @@ export const apiLogging = async (req: Request, res: Response, next: NextFunction
     logApiCall(req, statusCode, responseTime).catch(console.error);
     
     // Call original end method
-    originalEnd.call(this, chunk, encoding);
+    return originalEnd.call(this, chunk, encoding);
   };
 
   next();
@@ -55,6 +55,7 @@ async function logApiCall(req: Request, statusCode: number, responseTime: number
     await prisma.aPILog.create({
       data: {
         apiKeyId: apiKey.id,
+        userId: apiKey.userId,
         endpoint: req.path,
         method: req.method,
         statusCode,

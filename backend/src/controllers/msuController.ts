@@ -19,7 +19,7 @@ export const getCharacters = asyncHandler(async (req: Request, res: Response) =>
   const { server, limit } = req.query;
   
   const characters = await msuApiService.getCharacters(
-    server as string,
+    server as string | undefined,
     limit ? parseInt(limit as string) : 50
   );
   
@@ -44,9 +44,9 @@ export const searchCharacters = asyncHandler(async (req: Request, res: Response)
     });
   }
   
-  const characters = await msuApiService.searchCharacters(q as string, server as string);
+  const characters = await msuApiService.searchCharacters(q as string, server as string | undefined);
   
-  res.json({
+  return res.json({
     success: true,
     data: characters,
     timestamp: new Date().toISOString()
@@ -70,11 +70,11 @@ export const getGuilds = asyncHandler(async (req: Request, res: Response) => {
   const { server, limit } = req.query;
   
   const guilds = await msuApiService.getGuilds(
-    server as string,
+    server as string | undefined,
     limit ? parseInt(limit as string) : 50
   );
   
-  res.json({
+  return res.json({
     success: true,
     data: guilds,
     timestamp: new Date().toISOString()
@@ -95,9 +95,9 @@ export const searchGuilds = asyncHandler(async (req: Request, res: Response) => 
     });
   }
   
-  const guilds = await msuApiService.searchGuilds(q as string, server as string);
+  const guilds = await msuApiService.searchGuilds(q as string, server as string | undefined);
   
-  res.json({
+  return res.json({
     success: true,
     data: guilds,
     timestamp: new Date().toISOString()
@@ -121,12 +121,12 @@ export const getItems = asyncHandler(async (req: Request, res: Response) => {
   const { type, rarity, limit } = req.query;
   
   const items = await msuApiService.getItems(
-    type as string,
-    rarity as string,
+    type as string | undefined,
+    rarity as string | undefined,
     limit ? parseInt(limit as string) : 50
   );
   
-  res.json({
+  return res.json({
     success: true,
     data: items,
     timestamp: new Date().toISOString()
@@ -147,9 +147,9 @@ export const searchItems = asyncHandler(async (req: Request, res: Response) => {
     });
   }
   
-  const items = await msuApiService.searchItems(q as string, type as string);
+  const items = await msuApiService.searchItems(q as string, type as string | undefined);
   
-  res.json({
+  return res.json({
     success: true,
     data: items,
     timestamp: new Date().toISOString()
