@@ -14,7 +14,7 @@ export class MSUApiService {
     }
 
     this.api = axios.create({
-      baseURL: process.env.MSU_API_BASE_URL || 'https://api.msu.io',
+      baseURL: process.env.MSU_API_BASE_URL || 'https://openapi.msu.io/v1rc1',
       timeout: 30000,
       headers: {
         'Authorization': `Bearer ${this.apiKey}`,
