@@ -47,6 +47,7 @@ model APIKey {
 model APILog {
   id          String   @id @default(cuid())
   apiKeyId    String
+  userId      String   // Add userId field
   endpoint    String
   method      String
   statusCode  Int
@@ -57,6 +58,7 @@ model APILog {
 
   // Relations
   apiKey      APIKey   @relation(fields: [apiKeyId], references: [id], onDelete: Cascade)
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("api_logs")
 }
