@@ -34,10 +34,13 @@ const Accounts = () => {
 
   const handleTradableToggle = () => {
     setShowTradableOnly(!showTradableOnly)
-    // Reload characters after a short delay to update the UI
-    setTimeout(() => {
-      loadCharacters()
-    }, 100)
+    // Only reload characters if no other APIs are loading
+    const isLoading = loadingStates.currencies || loadingStates.items || loadingStates.neso || loading
+    if (!isLoading) {
+      setTimeout(() => {
+        loadCharacters()
+      }, 100)
+    }
   }
 
   const loadAll = async () => {
@@ -82,10 +85,14 @@ const Accounts = () => {
     } catch (e: any) {
       console.error(e)
       setError(e?.response?.data?.error?.message || 'Không thể tải dữ liệu từ OpenAPI')
-    } finally {
-      setLoading(false)
-      setLoadingStates({ currencies: false, items: false, characters: false, neso: false })
-    }
+     } finally {
+       setLoading(false)
+       setLoadingStates({ currencies: false, items: false, characters: false, neso: false })
+       // Reload characters with current filter setting after all APIs complete
+       setTimeout(() => {
+         loadCharacters()
+       }, 100)
+     }
   }
 
   return (
@@ -155,11 +162,12 @@ const Accounts = () => {
                  <span className="text-sm text-gray-600">Tradable Only:</span>
                  <button
                    onClick={handleTradableToggle}
+                   disabled={loading || loadingStates.currencies || loadingStates.items || loadingStates.neso}
                    className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
                      showTradableOnly 
                        ? 'bg-blue-500 text-white' 
                        : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                   }`}
+                   } ${(loading || loadingStates.currencies || loadingStates.items || loadingStates.neso) ? 'opacity-50 cursor-not-allowed' : ''}`}
                  >
                    {showTradableOnly ? 'ON' : 'OFF'}
                  </button>
