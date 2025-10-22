@@ -16,16 +16,23 @@ const Accounts = () => {
     setLoading(true)
     setError(null)
     try {
-      const [charsRes, currRes, itemsRes, nesoRes] = await Promise.all([
-        apiService.getAccountCharacters(wallet, { isTradable: true, pageNo: 1, pageSize: 10 }),
-        apiService.getAccountCurrencies(wallet),
-        apiService.getAccountItems(wallet, { pageNo: 1, pageSize: 10 }),
-        apiService.getAccountNeso(wallet),
-      ])
-
-      setCharacters(charsRes.data?.characters || [])
+      // Gọi tuần tự để tránh rate limit (1 req/s)
+      const currRes = await apiService.getAccountCurrencies(wallet)
       setCurrencies(currRes.data?.currency || [])
+      
+      await new Promise(resolve => setTimeout(resolve, 1100)) // Đợi 1.1s
+      
+      const itemsRes = await apiService.getAccountItems(wallet, { pageNo: 1, pageSize: 10 })
       setItems(itemsRes.data?.elements || [])
+      
+      await new Promise(resolve => setTimeout(resolve, 1100)) // Đợi 1.1s
+      
+      const charsRes = await apiService.getAccountCharacters(wallet, { isTradable: true, pageNo: 1, pageSize: 10 })
+      setCharacters(charsRes.data?.characters || [])
+      
+      await new Promise(resolve => setTimeout(resolve, 1100)) // Đợi 1.1s
+      
+      const nesoRes = await apiService.getAccountNeso(wallet)
       setNeso(nesoRes || {})
     } catch (e: any) {
       console.error(e)
