@@ -16,6 +16,29 @@ const Accounts = () => {
     characters: false,
     neso: false
   })
+  const [showTradableOnly, setShowTradableOnly] = useState(false)
+
+  const loadCharacters = async () => {
+    if (!wallet.trim()) return
+    setLoadingStates(prev => ({ ...prev, characters: true }))
+    try {
+      const charsRes = await apiService.getAccountCharacters(wallet, { isTradable: showTradableOnly, pageNo: 1, pageSize: 50 })
+      setCharacters(charsRes.data?.characters || [])
+    } catch (e: any) {
+      console.error(e)
+      setError(e?.response?.data?.error?.message || 'Không thể tải characters')
+    } finally {
+      setLoadingStates(prev => ({ ...prev, characters: false }))
+    }
+  }
+
+  const handleTradableToggle = () => {
+    setShowTradableOnly(!showTradableOnly)
+    // Reload characters after a short delay to update the UI
+    setTimeout(() => {
+      loadCharacters()
+    }, 100)
+  }
 
   const loadAll = async () => {
     if (!wallet.trim()) return
@@ -45,7 +68,7 @@ const Accounts = () => {
       
       // Characters
       setLoadingStates(prev => ({ ...prev, characters: true }))
-      const charsRes = await apiService.getAccountCharacters(wallet, { isTradable: true, pageNo: 1, pageSize: 10 })
+      const charsRes = await apiService.getAccountCharacters(wallet, { isTradable: showTradableOnly, pageNo: 1, pageSize: 50 })
       setCharacters(charsRes.data?.characters || [])
       setLoadingStates(prev => ({ ...prev, characters: false }))
       
@@ -120,34 +143,87 @@ const Accounts = () => {
       </div>
 
       <div className="grid md:grid-cols-2 gap-6">
-        {/* Characters */}
-        <div className="card">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center">
-              <Users className="w-5 h-5 mr-2" />
-              <h2 className="font-semibold">Characters ({characters.length})</h2>
-            </div>
-            {loadingStates.characters ? (
-              <Loader2 className="w-4 h-4 animate-spin text-blue-500" />
-            ) : characters.length > 0 ? (
-              <CheckCircle className="w-4 h-4 text-green-500" />
-            ) : null}
-          </div>
+         {/* Characters */}
+         <div className="card">
+           <div className="flex items-center justify-between mb-4">
+             <div className="flex items-center">
+               <Users className="w-5 h-5 mr-2" />
+               <h2 className="font-semibold">Characters ({characters.length})</h2>
+             </div>
+             <div className="flex items-center gap-3">
+               <div className="flex items-center gap-2">
+                 <span className="text-sm text-gray-600">Tradable Only:</span>
+                 <button
+                   onClick={handleTradableToggle}
+                   className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
+                     showTradableOnly 
+                       ? 'bg-blue-500 text-white' 
+                       : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                   }`}
+                 >
+                   {showTradableOnly ? 'ON' : 'OFF'}
+                 </button>
+               </div>
+               {loadingStates.characters ? (
+                 <Loader2 className="w-4 h-4 animate-spin text-blue-500" />
+               ) : characters.length > 0 ? (
+                 <CheckCircle className="w-4 h-4 text-green-500" />
+               ) : null}
+             </div>
+           </div>
           <div className="space-y-3">
             {loadingStates.characters ? (
               <div className="flex items-center justify-center py-4">
                 <Loader2 className="w-6 h-6 animate-spin text-blue-500 mr-2" />
                 <span className="text-gray-600">Đang tải characters...</span>
               </div>
-            ) : characters.length === 0 ? (
-              <p className="text-gray-500 text-center py-4">Không có characters</p>
-            ) : (
-              <div className="text-center py-8">
-                <Users className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                <p className="text-gray-500 text-lg">Không có Characters</p>
-                <p className="text-gray-400 text-sm">Ví này chưa có nhân vật nào</p>
-              </div>
-            )}
+             ) : characters.length === 0 ? (
+               <div className="text-center py-8">
+                 <Users className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                 <p className="text-gray-500 text-lg">Không có Characters</p>
+                 <p className="text-gray-400 text-sm">
+                   {showTradableOnly 
+                     ? 'Không có characters có thể trade' 
+                     : 'Ví này chưa có nhân vật nào'
+                   }
+                 </p>
+               </div>
+             ) : (
+               characters.map((c, i) => (
+                 <div key={i} className="p-4 rounded-lg border bg-gradient-to-r from-blue-50 to-indigo-50 border-l-4 border-blue-400">
+                   <div className="flex items-start justify-between">
+                     <div className="flex-1">
+                       <div className="flex items-center gap-2 mb-2">
+                         <span className="font-semibold text-blue-900 text-lg">{c.name || 'Unknown'}</span>
+                         <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full font-medium">
+                           Level {c.data?.level || 'N/A'}
+                         </span>
+                       </div>
+                       <div className="text-sm text-gray-600 mb-2">
+                         <div>Asset Key: {c.assetKey}</div>
+                         <div>Job Code: {c.data?.jobCode || 'N/A'} • World: {c.data?.world || 'N/A'}</div>
+                         <div>Experience: {c.data?.expr || 'N/A'} • Category: {c.categoryNo || 'N/A'}</div>
+                       </div>
+                       <div className="flex gap-2">
+                         <span className="px-2 py-1 bg-indigo-100 text-indigo-800 text-xs rounded">
+                           Class: {c.data?.classCode || 'N/A'}
+                         </span>
+                         <span className="px-2 py-1 bg-purple-100 text-purple-800 text-xs rounded">
+                           Job: {c.data?.jobCode || 'N/A'}
+                         </span>
+                       </div>
+                     </div>
+                     {c.data?.imageUrl && (
+                       <img 
+                         src={c.data.imageUrl} 
+                         alt={c.name} 
+                         className="w-20 h-20 rounded-lg object-cover border-2 border-blue-200" 
+                       />
+                     )}
+                   </div>
+                 </div>
+               ))
+             )}
           </div>
         </div>
 
