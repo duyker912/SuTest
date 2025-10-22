@@ -91,7 +91,32 @@ const Accounts = () => {
             </button>
           </div>
         </div>
-        {error && <p className="text-red-600 mt-3">{error}</p>}
+        {error && (
+          <div className="bg-red-50 border border-red-200 rounded-lg p-4 mt-3">
+            <div className="flex items-center">
+              <AlertCircle className="w-5 h-5 text-red-500 mr-2" />
+              <span className="text-red-700">{error}</span>
+            </div>
+          </div>
+        )}
+        
+        {/* Wallet Info */}
+        {wallet && (
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mt-3">
+            <div className="flex items-center justify-between">
+              <div>
+                <span className="font-medium text-blue-800">Wallet Address:</span>
+                <div className="text-sm text-blue-600 font-mono">{wallet}</div>
+              </div>
+              <button 
+                onClick={() => navigator.clipboard.writeText(wallet)}
+                className="px-3 py-1 bg-blue-100 text-blue-700 rounded text-sm hover:bg-blue-200 transition-colors"
+              >
+                Copy
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="grid md:grid-cols-2 gap-6">
@@ -117,24 +142,11 @@ const Accounts = () => {
             ) : characters.length === 0 ? (
               <p className="text-gray-500 text-center py-4">Không có characters</p>
             ) : (
-              characters.map((c, i) => (
-                <div key={i} className="p-4 rounded-lg border bg-gradient-to-r from-blue-50 to-indigo-50">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <div className="font-semibold text-gray-900">{c.name || c.assetKey || 'N/A'}</div>
-                      <div className="text-sm text-gray-600">
-                        Level: {c.data?.level || 'N/A'} • World: {c.data?.world || 'N/A'}
-                      </div>
-                      {c.data?.jobCode && (
-                        <div className="text-xs text-blue-600 mt-1">Job: {c.data.jobCode}</div>
-                      )}
-                    </div>
-                    {c.data?.imageUrl && (
-                      <img src={c.data.imageUrl} alt={c.name} className="w-12 h-12 rounded-full object-cover" />
-                    )}
-                  </div>
-                </div>
-              ))
+              <div className="text-center py-8">
+                <Users className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                <p className="text-gray-500 text-lg">Không có Characters</p>
+                <p className="text-gray-400 text-sm">Ví này chưa có nhân vật nào</p>
+              </div>
             )}
           </div>
         </div>
@@ -161,17 +173,38 @@ const Accounts = () => {
             ) : currencies.length === 0 ? (
               <p className="text-gray-500 text-center py-4">Không có currencies</p>
             ) : (
-              currencies.map((c, i) => (
-                <div key={i} className="flex justify-between items-center p-3 rounded-lg bg-gradient-to-r from-yellow-50 to-orange-50">
-                  <div>
-                    <span className="font-medium">{c.name || c.code}</span>
-                    {c.code && c.name && (
-                      <div className="text-xs text-gray-500">{c.code}</div>
-                    )}
+              currencies.map((c, i) => {
+                const amount = parseFloat(c.amount) / Math.pow(10, 18); // Convert wei to readable format
+                const isMainCurrency = c.code === '1'; // Essence is main currency
+                
+                return (
+                  <div key={i} className={`flex justify-between items-center p-4 rounded-lg border-l-4 ${
+                    isMainCurrency 
+                      ? 'bg-gradient-to-r from-yellow-50 to-orange-50 border-yellow-400' 
+                      : 'bg-gradient-to-r from-gray-50 to-slate-50 border-gray-300'
+                  }`}>
+                    <div>
+                      <span className={`font-medium ${isMainCurrency ? 'text-yellow-800' : 'text-gray-800'}`}>
+                        {c.name || c.code}
+                      </span>
+                      {c.code && c.name && (
+                        <div className="text-xs text-gray-500">Code: {c.code}</div>
+                      )}
+                    </div>
+                    <div className="text-right">
+                      <span className={`font-bold text-lg ${isMainCurrency ? 'text-yellow-600' : 'text-gray-600'}`}>
+                        {amount > 0 ? amount.toLocaleString('en-US', { 
+                          maximumFractionDigits: 2,
+                          minimumFractionDigits: 0 
+                        }) : '0'}
+                      </span>
+                      {isMainCurrency && (
+                        <div className="text-xs text-yellow-600 font-medium">ESSENCE</div>
+                      )}
+                    </div>
                   </div>
-                  <span className="font-bold text-lg text-green-600">{c.amount}</span>
-                </div>
-              ))
+                );
+              })
             )}
           </div>
         </div>
@@ -199,20 +232,32 @@ const Accounts = () => {
               <p className="text-gray-500 text-center py-4">Không có items</p>
             ) : (
               items.map((it, i) => (
-                <div key={i} className="p-4 rounded-lg border bg-gradient-to-r from-purple-50 to-pink-50">
+                <div key={i} className={`p-4 rounded-lg border-l-4 ${
+                  it.isSbt 
+                    ? 'bg-gradient-to-r from-purple-50 to-pink-50 border-purple-400' 
+                    : 'bg-gradient-to-r from-blue-50 to-cyan-50 border-blue-400'
+                }`}>
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
-                      <div className="font-semibold text-gray-900">
-                        {it.nftItem?.itemName || it.name || 'Unknown Item'}
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className={`font-semibold ${it.isSbt ? 'text-purple-900' : 'text-blue-900'}`}>
+                          {it.nftItem?.itemName || it.name || 'Unknown Item'}
+                        </span>
+                        {it.isSbt && (
+                          <span className="px-2 py-1 bg-purple-100 text-purple-800 text-xs rounded-full font-medium">
+                            SBT
+                          </span>
+                        )}
                       </div>
-                      <div className="text-sm text-gray-600 mt-1">
-                        Token: {it.tokenId || '-'} • Category: {it.categoryNo || 'N/A'}
+                      <div className="text-sm text-gray-600 mb-2">
+                        <div>ID: {it.itemId} • Category: {it.categoryNo}</div>
+                        <div>Minting #: {it.mintingNo}</div>
                       </div>
                       {it.nftItem && (
-                        <div className="flex gap-2 mt-2">
+                        <div className="flex flex-wrap gap-2">
                           {it.nftItem.starforce > 0 && (
                             <span className="px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded">
-                              ⭐ {it.nftItem.starforce}
+                              ⭐ {it.nftItem.starforce}/{it.nftItem.maxStarforce}
                             </span>
                           )}
                           {it.nftItem.potentialGrade > 0 && (
@@ -220,11 +265,25 @@ const Accounts = () => {
                               Potential: {it.nftItem.potentialGrade}
                             </span>
                           )}
+                          {it.nftItem.bonusPotentialGrade > 0 && (
+                            <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded">
+                              Bonus: {it.nftItem.bonusPotentialGrade}
+                            </span>
+                          )}
+                          {it.nftItem.enableStarforce && (
+                            <span className="px-2 py-1 bg-orange-100 text-orange-800 text-xs rounded">
+                              Starforce Enabled
+                            </span>
+                          )}
                         </div>
                       )}
                     </div>
                     {it.nftItem?.imageUrl && (
-                      <img src={it.nftItem.imageUrl} alt={it.nftItem.itemName} className="w-12 h-12 rounded object-cover" />
+                      <img 
+                        src={it.nftItem.imageUrl} 
+                        alt={it.nftItem.itemName} 
+                        className="w-16 h-16 rounded-lg object-cover border-2 border-gray-200" 
+                      />
                     )}
                   </div>
                 </div>
@@ -254,20 +313,59 @@ const Accounts = () => {
               </div>
             ) : (
               <>
-                <div className="p-4 rounded-lg bg-gradient-to-r from-green-50 to-emerald-50">
+                <div className="p-4 rounded-lg bg-gradient-to-r from-green-50 to-emerald-50 border-l-4 border-green-400">
                   <div className="flex justify-between items-center">
-                    <span className="font-medium">On-chain NESO</span>
-                    <span className="font-bold text-lg text-green-600">
-                      {neso.onchainNeso || '0'}
-                    </span>
+                    <div>
+                      <span className="font-medium text-green-800">On-chain NESO</span>
+                      <div className="text-xs text-green-600">Blockchain Balance</div>
+                    </div>
+                    <div className="text-right">
+                      <span className="font-bold text-xl text-green-600">
+                        {neso.onchainNeso ? (parseFloat(neso.onchainNeso) / Math.pow(10, 18)).toLocaleString('en-US', { 
+                          maximumFractionDigits: 2,
+                          minimumFractionDigits: 0 
+                        }) : '0'}
+                      </span>
+                      <div className="text-xs text-green-600 font-medium">NESO</div>
+                    </div>
                   </div>
                 </div>
-                <div className="p-4 rounded-lg bg-gradient-to-r from-blue-50 to-cyan-50">
+                <div className="p-4 rounded-lg bg-gradient-to-r from-blue-50 to-cyan-50 border-l-4 border-blue-400">
                   <div className="flex justify-between items-center">
-                    <span className="font-medium">Off-chain NESO</span>
-                    <span className="font-bold text-lg text-blue-600">
-                      {neso.offchainNeso || '0'}
-                    </span>
+                    <div>
+                      <span className="font-medium text-blue-800">Off-chain NESO</span>
+                      <div className="text-xs text-blue-600">Game Balance</div>
+                    </div>
+                    <div className="text-right">
+                      <span className="font-bold text-xl text-blue-600">
+                        {neso.offchainNeso ? (parseFloat(neso.offchainNeso) / Math.pow(10, 18)).toLocaleString('en-US', { 
+                          maximumFractionDigits: 2,
+                          minimumFractionDigits: 0 
+                        }) : '0'}
+                      </span>
+                      <div className="text-xs text-blue-600 font-medium">NESO</div>
+                    </div>
+                  </div>
+                </div>
+                <div className="p-4 rounded-lg bg-gradient-to-r from-gray-50 to-slate-50 border-l-4 border-gray-400">
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <span className="font-medium text-gray-800">Total NESO</span>
+                      <div className="text-xs text-gray-600">Combined Balance</div>
+                    </div>
+                    <div className="text-right">
+                      <span className="font-bold text-xl text-gray-700">
+                        {(() => {
+                          const onchain = parseFloat(neso.onchainNeso || '0') / Math.pow(10, 18);
+                          const offchain = parseFloat(neso.offchainNeso || '0') / Math.pow(10, 18);
+                          return (onchain + offchain).toLocaleString('en-US', { 
+                            maximumFractionDigits: 2,
+                            minimumFractionDigits: 0 
+                          });
+                        })()}
+                      </span>
+                      <div className="text-xs text-gray-600 font-medium">NESO</div>
+                    </div>
                   </div>
                 </div>
               </>
